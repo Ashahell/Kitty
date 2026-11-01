@@ -1,0 +1,7 @@
+L1 | #include <(iostream|filesystem|regex|thread)> | all | C03 banned headers | tests/lint-fixtures/L1/bad.cpp
+L2 | \b(float|double)\b | sim/,snapshot/,input/,level/ | C06 no floats in sim | tests/lint-fixtures/L2/sim/bad.cpp
+L3 | sinf|cosf|tanf|sqrtf|pow\(|fmod|exp2? | sim/,snapshot/,input/,level/ | no libm in sim | tests/lint-fixtures/L3/sim/bad.cpp
+L4 | virtual | engine | C29 no virtual dispatch in hot data | tests/lint-fixtures/L4/bad.cpp
+L5 | \bstatic\s+[A-Za-z_][A-Za-z0-9_]*\s+[A-Za-z_][A-Za-z0-9_]*\s*; | engine | no function-local statics with non-trivial init | tests/lint-fixtures/L5/bad.cpp
+L6 | ^[ \t]*(?:static\s+)?[A-Za-z_][A-Za-z0-9_:]*[ \t]+[A-Za-z_][A-Za-z0-9_]*[ \t]*\(\s*[0-9] | engine | C03/C29 no global constructors | tests/lint-fixtures/L6/bad.cpp
+L7 | \bnew\s|\bdelete\s | engine | C29 fixed arrays and per-room arenas only | tests/lint-fixtures/L7/bad.cpp
