@@ -278,3 +278,97 @@
 - Updated: AROS platform facts the engine depends on
 
 ## [2026-11-09] lint | 0 issues found, 0 auto-fixed
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-10-m0b15-aros-guest-prompt.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-10-m0b15-aros-critique.md
+- Updated: Audio: AHI device path and modplay
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-10-m0b16-aros-guest-prompt.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-10-m0b16-aros-critique.md
+- Updated: AROS platform facts the engine depends on
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-10-m0b17-aros-guest-prompt.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-10-m0b17-aros-critique.md
+- Updated: AROS platform facts the engine depends on
+- Updated: opencode dispatch lessons
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-10-m0b18-aros-guest-prompt.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-10-m0b18-aros-critique.md
+- Updated: Audio: AHI device path and modplay
+- Updated: AROS platform facts the engine depends on
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-10-m0b19-aros-guest-prompt.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-11-m0b19-aros-critique.md
+- Updated: Audio: AHI device path and modplay
+- Updated: AROS platform facts the engine depends on
+- Updated: opencode dispatch lessons
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-11-m0b20-aros-guest-prompt.md
+
+## [2026-11-12] ingest | opencode dispatch lessons
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-11-m0b20-aros-guest-dsh-prompt.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-11-m0b20-dsh-resume-message.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-12-m0b20-aros-critique.md
+- Updated: Audio: AHI device path and modplay
+- Updated: AROS platform facts the engine depends on
+- Updated: opencode dispatch lessons
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-12-m0b21-aros-guest-prompt.md
+
+## [2026-11-12] ingest | opencode dispatch lessons
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-12-m0b21-aros-guest-dsh-prompt.md
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-12-m0b21-aros-critique.md
+- Updated: Audio: AHI device path and modplay
+- Updated: AROS platform facts the engine depends on
+- Updated: opencode dispatch lessons
+
+## [2026-11-12] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-12-m0b22-aros-guest-prompt.md
+- Updated: Audio: AHI device path and modplay
+
+## [2026-11-12] ingest | opencode dispatch lessons
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-12-m0b22-aros-guest-dsh-prompt.md
+
+## [2026-11-12] lint | 0 issues found, 0 auto-fixed
