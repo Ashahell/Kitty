@@ -1,0 +1,4 @@
+; h — headless, three frames dumped for the host comparison.
+Stack 1048576
+RAM:kitty/kitty >RAM:kitty/out/run_h.log --headless --frames 300 --dump 0,150,299 --out RAM:kitty/out/h --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_h.txt

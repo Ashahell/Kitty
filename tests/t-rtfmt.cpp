@@ -69,6 +69,24 @@ int main() {
     zero(b, 64); r = rt_fmt(b, 64, "%.0f", 2.5);
     report("f0_half", b, r, "3", 1u);
 
+    zero(b, 64); r = rt_fmt(b, 64, "%.3f", __builtin_nan(""));
+    report("nan", b, r, "nan", 3u);
+
+    zero(b, 64); r = rt_fmt(b, 64, "%.0f", __builtin_inf());
+    report("inf", b, r, "inf", 3u);
+
+    zero(b, 64); r = rt_fmt(b, 64, "%.2f", -__builtin_inf());
+    report("ninf", b, r, "-inf", 4u);
+
+    zero(b, 64); r = rt_fmt(b, 64, "%.1f|%u", 1e12, 7u);
+    report("big", b, r, "%.1f|7", 6u);
+
+    zero(b, 64); r = rt_fmt(b, 64, "%33u|%u", 5u, 6u);
+    report("w33", b, r, "%33u|6", 6u);
+
+    zero(b, 64); r = rt_fmt(b, 64, "%32u", 5u);
+    report("w32", b, r, "                               5", 32u);
+
     zero(b, 64); r = rt_fmt(b, 64, "tier=%s n=%u ms=%.3f", "lavapipe", 5u, 0.694);
     report("mixed", b, r, "tier=lavapipe n=5 ms=0.694", 26u);
 

@@ -10,6 +10,8 @@ u32 rt_vfmt(char* out, u32 n, const char* fmt, va_list ap) {
 
     for (const char* p = fmt; *p != '\0'; ++p) {
         if (*p != '%') { put(*p); continue; }
+        const char* spec = p;
+        bool width_big = false;
 
         const char* q = p + 1;
         bool zero = false;
@@ -18,7 +20,7 @@ u32 rt_vfmt(char* out, u32 n, const char* fmt, va_list ap) {
         if (*q >= '1' && *q <= '9') {
             while (*q >= '0' && *q <= '9') {
                 width = width * 10u + static_cast<u32>(*q - '0');
-                if (width > 32u) width = 32u;
+                if (width > 32u) { width_big = true; width = 32u; }
                 ++q;
             }
         }
@@ -47,6 +49,18 @@ u32 rt_vfmt(char* out, u32 n, const char* fmt, va_list ap) {
 
         p = q;
 
+        if (width_big) {
+            if (conv == 'f') (void)va_arg(ap, double);
+            else if (conv == 's') (void)va_arg(ap, const char*);
+            else if (conv == 'c') (void)va_arg(ap, int);
+            else if (conv == 'd' || conv == 'u' || conv == 'x') {
+                if (llflag) (void)va_arg(ap, long long);
+                else (void)va_arg(ap, unsigned int);
+            }
+            for (const char* z = spec; z <= q; ++z) put(*z);
+            continue;
+        }
+
         if (conv == '%') { put('%'); continue; }
 
         if (conv == 'c') {
@@ -69,8 +83,25 @@ u32 rt_vfmt(char* out, u32 n, const char* fmt, va_list ap) {
 
         if (conv == 'f') {
             const double v = va_arg(ap, double);
+            if (__builtin_isnan(v)) {
+                pad(width > 3u ? width - 3u : 0u, ' ');
+                put('n'); put('a'); put('n');
+                continue;
+            }
+            if (__builtin_isinf(v)) {
+                const bool negi = v < 0.0;
+                const u32 lni = negi ? 4u : 3u;
+                pad(width > lni ? width - lni : 0u, ' ');
+                if (negi) put('-');
+                put('i'); put('n'); put('f');
+                continue;
+            }
             const bool negf = v < 0.0;
             const double av = negf ? -v : v;
+            if (av >= 1000000000000.0) {
+                for (const char* z = spec; z <= q; ++z) put(*z);
+                continue;
+            }
             const u64 pw = kpow10[prec];
             const u64 qq = static_cast<u64>(av * static_cast<double>(pw) + 0.5);
             char seq[72];

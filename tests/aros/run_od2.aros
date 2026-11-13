@@ -1,0 +1,4 @@
+; od2 — overdraw 2 benchmark.
+Stack 1048576
+RAM:kitty/kitty >RAM:kitty/out/run_od2.log --headless --frames 300 --bench --overdraw 2 --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_od2.txt

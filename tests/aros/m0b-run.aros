@@ -1,0 +1,28 @@
+; m0b-run.aros — the whole M0b.1 guest sequence in one script (D32–D34).
+; Run from the Shell with:  Execute RAM:kitty/m0b-run.aros
+; The host runner (tests/aros/lane_run.sh) executes the same fragments one
+; --exec at a time; keep both paths in step. The runner creates out/ before
+; the prelude, so a hand run of this script should do
+; `MakeDir RAM:kitty/out` first if out/ does not exist yet.
+Stack 1048576
+Execute RAM:kitty/prelude.aros
+MakeDir RAM:kitty/out
+MakeDir RAM:kitty/out/p
+MakeDir RAM:kitty/out/w
+MakeDir RAM:kitty/out/h
+Avail >RAM:kitty/out/avail_before.txt
+Execute RAM:kitty/run_p.aros
+Execute RAM:kitty/run_pt.aros
+Execute RAM:kitty/run_ptr.aros
+Execute RAM:kitty/run_w.aros
+Execute RAM:kitty/run_h.aros
+Execute RAM:kitty/run_fifo.aros
+Execute RAM:kitty/run_a.aros
+Execute RAM:kitty/run_lp0.aros
+Execute RAM:kitty/run_lp1.aros
+Execute RAM:kitty/run_lp4.aros
+Execute RAM:kitty/run_od2.aros
+Execute RAM:kitty/run_od4.aros
+Execute RAM:kitty/run_b1.aros
+Execute RAM:kitty/run_soak.aros
+Avail >RAM:kitty/out/avail_after.txt

@@ -1,0 +1,4 @@
+; ptr — D33: the release build must reject the debug-only plant with exit 2.
+Stack 1048576
+RAM:kitty/kitty >RAM:kitty/out/run_ptr.log --plant-loader-fail --headless --frames 1 --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_ptr.txt

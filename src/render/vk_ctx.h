@@ -1,8 +1,6 @@
 #pragma once
 #include "render_types.h"
 
-extern "C" VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance, const char*);
-
 enum VkClass {
     VKC_NORMAL = 0,
     VKC_RECREATE_SWAPCHAIN,
@@ -61,5 +59,6 @@ struct VkApi {
 #undef X
 };
 
-void vk_api_load_instance(VkApi&, VkInstance);
+void vk_api_load_instance(VkApi&, VkInstance, PFN_vkGetInstanceProcAddr);
 void vk_api_load_device(VkApi&, VkDevice);
+const char* vk_api_missing_device(const VkApi&, bool wsi);

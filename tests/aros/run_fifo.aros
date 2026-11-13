@@ -1,0 +1,4 @@
+; fifo — windowed present-mode plant (D30), must not hang.
+Stack 1048576
+RAM:kitty/kitty-debug >RAM:kitty/out/run_fifo.log --windowed --frames 60 --force-fifo --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_fifo.txt

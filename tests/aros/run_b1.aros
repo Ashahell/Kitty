@@ -1,0 +1,4 @@
+; b1 — baseline benchmark, overdraw 1.
+Stack 1048576
+RAM:kitty/kitty >RAM:kitty/out/run_b1.log --headless --frames 300 --bench --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_b1.txt

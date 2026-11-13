@@ -1,0 +1,4 @@
+; p — D33 probe: debug build, one headless frame, readback dir.
+Stack 1048576
+RAM:kitty/kitty-debug >RAM:kitty/out/run_p.log --headless --frames 1 --out RAM:kitty/out/p --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_p.txt

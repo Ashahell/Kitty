@@ -1,0 +1,4 @@
+; lp4 — D27 LP_NUM_THREADS override, four worker tasks.
+Stack 1048576
+RAM:kitty/kitty-debug >RAM:kitty/out/run_lp4.log --headless --frames 300 --bench --lp-threads 4 --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_lp4.txt

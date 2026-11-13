@@ -1,0 +1,4 @@
+; w — windowed, one presented frame dumped (D30), readback into out/w.
+Stack 1048576
+RAM:kitty/kitty-debug >RAM:kitty/out/run_w.log --windowed --frames 300 --present-dump 150 --out RAM:kitty/out/w --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_w.txt

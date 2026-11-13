@@ -106,6 +106,7 @@ struct RendCtx {
     float pipe_ms;
     bool plant_bad_copy;
     bool plant_bad_present;
+    bool force_fifo;   // --force-fifo (debug): skip the IMMEDIATE upgrade
     VkSemaphore bad_sem;
 };
 
@@ -120,15 +121,18 @@ const volatile u32* r_validation_counter(RendCtx&);
 const u8* r_pixels(RendCtx&);
 void r_set_plant_bad_copy(RendCtx&, bool);
 void r_set_plant_bad_present(RendCtx&, bool);
+void r_set_force_fifo(bool);
 void r_get_vp(RendCtx&, float out[16]);
 void r_set_plat(Plat&);
 Plat* r_plat(void);
 void r_set_probe_candidate(const char*);
 void r_set_probe_plant(bool);
+void r_set_probe_no_demote(bool);
 const char* r_probe_candidate(void);
 const char* r_probe_reason(void);
 const u8* r_probe_cand_bytes(void);
 [[noreturn]] void rv_die(const char* file, u32 line, const char* msg);
+void rv_wait_fence(RendCtx& r, VkFence fence);
 
 #define RV_LOGF(...) do { char rv_line_[1024]; rt_fmt(rv_line_, sizeof rv_line_, __VA_ARGS__); \
     if (r_plat()) pl_log(*r_plat(), rv_line_); } while (0)

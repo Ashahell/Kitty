@@ -8,17 +8,19 @@
 
 static char g_spv[512] = "build/spv";
 static Plat* g_plat = 0;
+static bool g_force_fifo = false;
 
 Plat* r_plat(void) { return g_plat; }
 void r_set_plat(Plat& p) { g_plat = &p; }
+void r_set_force_fifo(bool on) { g_force_fifo = on; }
 
 [[noreturn]] void rv_die(const char* file, u32 line, const char* msg) {
-    if (!g_plat) pl_trap(msg);
+    if (!g_plat) pl_trap(file, line, msg);
     char buf[512];
     rt_fmt(buf, sizeof buf, "Software Failure. %s:%u: %s", file, line, msg);
     pl_log(*g_plat, buf);
     pl_shutdown(*g_plat, 4);
-    pl_trap("rv_die returned");
+    PL_TRAP("rv_die returned");
 }
 
 static u64 now_us(void) {
@@ -160,7 +162,9 @@ static void create_swapchain(RendCtx& r) {
     if (nm) {
         VkResult mr = r.api.GetPhysicalDeviceSurfacePresentModesKHR(r.phys, r.surf, &nm, modes);
         if (mr != VK_SUCCESS && mr != VK_INCOMPLETE) rv_chk(r, "vkGetPhysicalDeviceSurfacePresentModesKHR", mr);
-        for (u32 i = 0; i < nm; i++) if (modes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR) mode = modes[i];
+        if (!r.force_fifo) {
+            for (u32 i = 0; i < nm; i++) if (modes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR) mode = modes[i];
+        }
     }
     VkCompositeAlphaFlagBitsKHR alpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     if (!(caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR)) {
@@ -481,6 +485,8 @@ static u32 count_true13(const VkPhysicalDeviceVulkan13Features* f) {
 }
 
 static RendCtx* common_init(Alloc a, Tier want, TierPick* pick, Plat* plat) {
+    Plat* gp = r_plat();
+    if (!gp) rv_die("src/render/render_init.cpp", __LINE__, "no platform");
     RendCtx* r = ctx_alloc(a);
     if (!r) return 0;
     r->windowed = plat != 0;
@@ -488,7 +494,7 @@ static RendCtx* common_init(Alloc a, Tier want, TierPick* pick, Plat* plat) {
 
     VkApi api;
     memset(&api, 0, sizeof api);
-    vk_api_load_instance(api, 0);
+    vk_api_load_instance(api, 0, pl_vk_gipa(*gp));
     if (!api.CreateInstance) rv_die("src/render/render_init.cpp", __LINE__, "Vulkan loader has no vkCreateInstance");
 
     const char* ext[8];
@@ -524,7 +530,7 @@ static RendCtx* common_init(Alloc a, Tier want, TierPick* pick, Plat* plat) {
     ici.enabledExtensionCount = next;
     ici.ppEnabledExtensionNames = next ? ext : 0;
     rv_chk(*r, "vkCreateInstance", api.CreateInstance(&ici, 0, &r->inst));
-    vk_api_load_instance(r->api, r->inst);
+    vk_api_load_instance(r->api, r->inst, pl_vk_gipa(*gp));
 
     RV_LOGF("api=1.3 instance_extensions=%u", next);
     for (u32 i = 0; i < next; i++) RV_LOGF("instance_extension=%s", ext[i]);
@@ -665,6 +671,10 @@ static RendCtx* common_init(Alloc a, Tier want, TierPick* pick, Plat* plat) {
     rv_chk(*r, "vkCreateDevice", r->api.CreateDevice(r->phys, &dci, 0, &r->dev));
     r->api.GetDeviceQueue(r->dev, r->qfam, 0, &r->queue);
     vk_api_load_device(r->api, r->dev);
+    if (const char* missing = vk_api_missing_device(r->api, plat != 0)) {
+        RV_LOGF("vk_entry_missing=%s", missing);
+        rv_die("src/render/render_init.cpp", __LINE__, "device entry point not loaded");
+    }
 
     if (pick) *pick = tp;
     return r;
@@ -763,6 +773,7 @@ struct ProbeState {
     GoldenImg cand;
     bool has_cand;
     bool plant_shift;
+    bool no_demote;
     const char* name;
     const char* reason;
     const char* req;
@@ -1142,6 +1153,19 @@ static bool probe_render_device(VkApi& api, VkInstance inst, VkPhysicalDevice ph
     return ok;
 }
 
+static bool probe_helper_feature(VkApi& api, VkPhysicalDevice phys) {
+    if (g_probe.no_demote) return false;
+    VkPhysicalDeviceVulkan13Features f13sup;
+    memset(&f13sup, 0, sizeof f13sup);
+    f13sup.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+    VkPhysicalDeviceFeatures2 f2;
+    memset(&f2, 0, sizeof f2);
+    f2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    f2.pNext = &f13sup;
+    api.GetPhysicalDeviceFeatures2(phys, &f2);
+    return f13sup.shaderDemoteToHelperInvocation != VK_FALSE;
+}
+
 void r_tier_probe(Alloc a, GoldenImg* ref, MatchResult* res) {
     g_probe.name = 0;
     g_probe.reason = 0;
@@ -1152,9 +1176,12 @@ void r_tier_probe(Alloc a, GoldenImg* ref, MatchResult* res) {
     if (!ref) return;
     bool want_lvp = g_probe.req && strcmp(g_probe.req, "lavapipe") == 0;
 
+    Plat* gp = r_plat();
+    if (!gp) rv_die("src/render/render_init.cpp", __LINE__, "no platform");
+
     VkApi api;
     memset(&api, 0, sizeof api);
-    vk_api_load_instance(api, 0);
+    vk_api_load_instance(api, 0, pl_vk_gipa(*gp));
     if (!api.CreateInstance) { g_probe.reason = "no vkCreateInstance"; return; }
     VkApplicationInfo ai;
     memset(&ai, 0, sizeof ai);
@@ -1167,7 +1194,7 @@ void r_tier_probe(Alloc a, GoldenImg* ref, MatchResult* res) {
     ici.pApplicationInfo = &ai;
     VkInstance inst = 0;
     if (api.CreateInstance(&ici, 0, &inst) != VK_SUCCESS) { g_probe.reason = "no Vulkan instance"; return; }
-    vk_api_load_instance(api, inst);
+    vk_api_load_instance(api, inst, pl_vk_gipa(*gp));
     u32 n = 0;
     if (api.EnumeratePhysicalDevices(inst, &n, 0) != VK_SUCCESS || n == 0 || n > 16) {
         g_probe.reason = "no physical devices";
@@ -1210,7 +1237,9 @@ void r_tier_probe(Alloc a, GoldenImg* ref, MatchResult* res) {
         api.DestroyInstance(inst, 0);
         return;
     }
-    if (cand_phys) {
+    if (cand_phys && !probe_helper_feature(api, cand_phys)) {
+        g_probe.reason = "shaderDemoteToHelperInvocation unsupported";
+    } else if (cand_phys) {
         u32 plant = g_probe.plant_shift ? 4u : 0u;
         if (probe_render_device(api, inst, cand_phys, a, plant, &g_probe.cand)) {
             g_probe.has_cand = true;
@@ -1228,6 +1257,7 @@ const char* r_probe_reason(void) { return g_probe.reason; }
 const u8* r_probe_cand_bytes(void) { return g_probe.has_cand ? g_probe.cand.rgba : 0; }
 void r_set_probe_candidate(const char* name) { g_probe.req = name; }
 void r_set_probe_plant(bool on) { g_probe.plant_shift = on; }
+void r_set_probe_no_demote(bool on) { g_probe.no_demote = on; }
 
 static void setup_resources(RendCtx* r) {
     VkCommandPoolCreateInfo pci;
@@ -1400,6 +1430,7 @@ RendCtx* r_init_wsi(Alloc a, Tier want, TierPick* pick, Plat& plat) {
     RendCtx* r = common_init(a, want, pick, &plat);
     if (!r) return 0;
     setup_resources(r);
+    r->force_fifo = g_force_fifo;
     create_swapchain(*r);
     r->init_ms = (float)(now_us() - t0) / 1000.0f;
     return r;
@@ -1437,7 +1468,7 @@ void r_shutdown(RendCtx& r) {
     if (r.cpool) r.api.DestroyCommandPool(r.dev, r.cpool, 0);
     if (r.dbg) r.api.DestroyDebugUtilsMessengerEXT(r.inst, r.dbg, 0);
     if (r.dev) r.api.DestroyDevice(r.dev, 0);
-    if (r.surf) r.api.DestroySurfaceKHR(r.inst, r.surf, 0);
+    if (r.surf) pl_wsi_destroy_surface(*r_plat(), r.inst, r.surf);
     if (r.inst) r.api.DestroyInstance(r.inst, 0);
     memset(&r, 0, sizeof r);
 }

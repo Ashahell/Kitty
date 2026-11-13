@@ -1,0 +1,4 @@
+; soak — windowed, thirty minutes, memory samples every minute, with music (D70).
+Stack 1048576
+RAM:kitty/kitty-debug >RAM:kitty/out/run_soak.log --windowed --seconds 1800 --music RAM:kitty/test.mod --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_soak.txt

@@ -26,6 +26,18 @@ void rv_chk(RendCtx& r, const char* call, VkResult res) {
     rv_die("src/render/render_util.cpp", __LINE__, "fatal Vulkan error");
 }
 
+/* A wait that times out is not a finished frame: llvmpipe on the AROS guest
+ * takes over a second on its first draw, and a dead worker never signals. */
+void rv_wait_fence(RendCtx& r, VkFence fence) {
+    const bool skip = r.skip_frame;
+    for (u32 s = 0; s < 30u; s++) {
+        VkResult res = r.api.WaitForFences(r.dev, 1, &fence, VK_TRUE, 1000000000ull);
+        if (res == VK_SUCCESS) { r.skip_frame = skip; return; }
+        rv_chk(r, "vkWaitForFences", res);
+    }
+    rv_die("src/render/render_util.cpp", __LINE__, "fence not signalled in 30 s");
+}
+
 u32 rv_mem_type(RendCtx& r, u32 bits, VkMemoryPropertyFlags want) {
     for (u32 i = 0; i < r.memprops.memoryTypeCount; i++) {
         if ((bits & (1u << i)) && (r.memprops.memoryTypes[i].propertyFlags & want) == want) return i;
@@ -143,7 +155,7 @@ void rv_one_shot(RendCtx& r, void (*fn)(RendCtx&, VkCommandBuffer, void*), void*
     si.commandBufferCount = 1;
     si.pCommandBuffers = &cb;
     rv_chk(r, "vkQueueSubmit", r.api.QueueSubmit(r.queue, 1, &si, fence));
-    rv_chk(r, "vkWaitForFences", r.api.WaitForFences(r.dev, 1, &fence, VK_TRUE, 1000000000ull));
+    rv_wait_fence(r, fence);
     r.api.DestroyFence(r.dev, fence, 0);
     r.api.FreeCommandBuffers(r.dev, r.cpool, 1, &cb);
 }

@@ -28,10 +28,13 @@ void mod_seek(Audio& a, u32 position) {
     mod_advance(a.mp, position);
 }
 
+/* Top up to the high-water mark (at most four buffers per tick), so the
+   device's clock, not the tick rate, decides how much is rendered. */
 void aud_tick(Audio& a) {
     if (!a.opened || !a.mp.loaded || !a.p) return;
-    if (pl_audio_queued_frames(*a.p) >= 3840u) return;
     i16 buf[960 * 2];
-    mod_render(a.mp, buf, 960);
-    pl_audio_queue(*a.p, buf, 960u);
+    for (u32 k = 0; k < 4u && pl_audio_queued_frames(*a.p) < 3840u; k++) {
+        mod_render(a.mp, buf, 960);
+        pl_audio_queue(*a.p, buf, 960u);
+    }
 }

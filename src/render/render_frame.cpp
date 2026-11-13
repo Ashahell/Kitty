@@ -1,5 +1,6 @@
 #include <cstring>
 #include "render_internal.h"
+#include "wsi.h"
 #include "render_util.h"
 
 static void update_ubo(RendCtx& r) {
@@ -149,6 +150,14 @@ static void blit_to_swapchain(RendCtx& r) {
     black.float32[3] = 1.0f;
     r.api.CmdClearColorImage(r.cb, sc, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &black, 1, &range);
     u32 w = r.sc_ext.width, h = r.sc_ext.height;
+    /* The picture is centred in the platform's area, at the swapchain's top left:
+     * on AROS the swapchain is larger than the area (D61). */
+    if (r.plat) {
+        u32 aw = w, ah = h;
+        pl_wsi_extent(*r.plat, &aw, &ah);
+        if (aw && aw < w) w = aw;
+        if (ah && ah < h) h = ah;
+    }
     u32 sx = w / 320u, sy = h / 256u;
     u32 s = sx < sy ? sx : sy;
     if (s < 1u) s = 1u;
@@ -209,7 +218,7 @@ VkResult r_present(RendCtx& r) {
     rv_chk(r, "vkEndCommandBuffer", r.api.EndCommandBuffer(r.cb));
 
     VkResult out = VK_SUCCESS;
-    rv_chk(r, "vkWaitForFences", r.api.WaitForFences(r.dev, 1, &r.fence, VK_TRUE, 1000000000ull));
+    rv_wait_fence(r, r.fence);
     rv_chk(r, "vkResetFences", r.api.ResetFences(r.dev, 1, &r.fence));
 
     VkSubmitInfo si;
@@ -230,7 +239,7 @@ VkResult r_present(RendCtx& r) {
         si.pSignalSemaphores = &sig_sem;
     }
     rv_chk(r, "vkQueueSubmit", r.api.QueueSubmit(r.queue, 1, &si, r.fence));
-    rv_chk(r, "vkWaitForFences", r.api.WaitForFences(r.dev, 1, &r.fence, VK_TRUE, 1000000000ull));
+    rv_wait_fence(r, r.fence);
 
     if (r.rmap) memcpy(r.pixels, r.rmap, 320u * 256u * 4u);
 

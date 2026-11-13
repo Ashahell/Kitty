@@ -1,0 +1,6 @@
+Assign ENVARC: DH1:W
+Assign LIBS: DH1:Libs
+Assign LIBS: ADD AROS:Libs
+Assign DEVS: RAM:kitty/Devs
+Assign DEVS: ADD AROS:Devs
+Assign >RAM:kitty/out/assigns.txt

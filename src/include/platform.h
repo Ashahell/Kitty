@@ -11,7 +11,7 @@ struct Plat;                        // opaque, initialized explicitly in main
 struct PlatEvent { u8 kind; u8 a; u16 b; u32 tick; };
 struct EventSink { PlatEvent ev[64]; u32 head, tail; };
 struct PlatEvents { EventSink* sink; };
-struct PlatArgs { const char* renderer_override; const char* save_root; };
+struct PlatArgs { const char* renderer_override; const char* save_root; int lp_threads; const char* lp_src; };
 enum ErrCode : u16 { OK=0, E_IO, E_VK, E_SCHEMA, E_SIM_OVF, E_SIM_DIV0,
                      E_SNAP_UNDERFLOW, E_AUDIO, E_TIER_FALLBACK };
 void pl_init(Plat&, const PlatArgs&);

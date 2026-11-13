@@ -1,0 +1,4 @@
+; pt — D33: debug build with the D37 plant; expects rc=4 and the D24 trap text.
+Stack 1048576
+RAM:kitty/kitty-debug >RAM:kitty/out/run_pt.log --plant-loader-fail --headless --frames 1 --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_pt.txt

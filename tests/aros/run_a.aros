@@ -1,0 +1,4 @@
+; a — headless audio run, ten seconds of .mod playback.
+Stack 1048576
+RAM:kitty/kitty-debug >RAM:kitty/out/run_a.log --headless --seconds 10 --music RAM:kitty/test.mod --spv RAM:kitty/spv
+Echo "rc=$RC" >RAM:kitty/out/rc_a.txt

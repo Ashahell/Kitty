@@ -43,6 +43,8 @@ void pl_init(Plat& p, const PlatArgs& args) {
     p.arate = 48000;
     p.queued_frames = 0;
     p.quit = false;
+    p.surf = 0;
+    p.events_drained = 0;
     const char* v = getenv("LP_NUM_THREADS");
     if (!v || !v[0]) {
         setenv("LP_NUM_THREADS", "0", 1);
@@ -98,7 +100,7 @@ static void* watchdog_main(void* arg) {
         left -= chunk;
     }
     if (!g_wd_stop) {
-        u32 vcnt = g_wd_validation ? (u32)*g_wd_validation : 0u;
+        u32 vcnt = g_wd_validation ? __atomic_load_n(g_wd_validation, __ATOMIC_RELAXED) : 0u;
         char line[256];
         rt_fmt(line, sizeof line, "validation_messages=%u", vcnt);
         plat_log_raw(line);
@@ -336,9 +338,19 @@ void pl_audio_queue(Plat& p, const i16* frames, u32 n) {
 
 u64 plat_audio_total_frames(Plat& p) { return p.queued_frames; }
 
-void pl_trap(const char* msg) {
+extern "C" VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance, const char*);
+
+PFN_vkGetInstanceProcAddr pl_vk_gipa(Plat& p) { (void)p; return &vkGetInstanceProcAddr; }
+
+void pl_wsi_destroy_surface(Plat& p, VkInstance inst, VkSurfaceKHR s) {
+    PFN_vkGetInstanceProcAddr g = pl_vk_gipa(p);
+    PFN_vkDestroySurfaceKHR d = (PFN_vkDestroySurfaceKHR)g(inst, "vkDestroySurfaceKHR");
+    if (d) d(inst, s, 0);
+}
+
+void pl_trap(const char* file, u32 line, const char* msg) {
     char buf[512];
-    rt_fmt(buf, sizeof buf, "Software Failure. src/platform/rt/traps.cpp:1: %s", msg);
+    rt_fmt(buf, sizeof buf, "Software Failure. %s:%u: %s", file, line, msg);
     fputs(buf, stderr);
     fputs("\n", stderr);
     _exit(4);
@@ -349,4 +361,13 @@ void pl_shutdown(Plat& p, int code) {
     if (p.win) { SDL_DestroyWindow((SDL_Window*)p.win); p.win = 0; }
     SDL_Quit();
     exit(code);
+}
+
+/* Guest-only log keys (D30/W4) have no Linux side: the Linux log must not
+ * change, so these are no-ops here and real on AROS. */
+void plat_exit_stats(Plat& p) { (void)p; }
+void plat_soak_sample(Plat& p) { (void)p; }
+u32 plat_lp_worker_tasks(Plat& p) { (void)p; return 0u; }
+bool pl_present_dump(Plat& p, u32 frame, const char* out_dir) {
+    (void)p; (void)frame; (void)out_dir; return false;
 }
