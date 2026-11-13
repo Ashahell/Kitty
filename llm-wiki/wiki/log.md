@@ -372,3 +372,31 @@
 - Raw: raw/dispatch/2026-11-12-m0b22-aros-guest-dsh-prompt.md
 
 ## [2026-11-12] lint | 0 issues found, 0 auto-fixed
+
+## [2026-11-13] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-12-m0b22-aros-critique.md
+- Updated: Audio: AHI device path and modplay
+- Updated: opencode dispatch lessons
+
+## [2026-11-13] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-12-m0b23-aros-guest-prompt.md
+- Updated: opencode dispatch lessons
+
+## [2026-11-13] ingest | opencode dispatch lessons
+- Disposition: Update
+- Raw: raw/dispatch/2026-11-12-m0b23-aros-guest-dsh-prompt.md
+
+## [2026-11-13] ingest | M0 implementation status
+- Disposition: Update
+- Raw: raw/reviews/2026-11-13-m0b23-aros-critique.md
+- Updated: Audio: AHI device path and modplay
+- Updated: opencode dispatch lessons
+
+## [2026-11-13] ingest | Kitty: Core Awakening — project overview
+- Disposition: Update
+- Raw: raw/project/2026-11-13-agents-md.md
+- Updated: M0 implementation status
+
+## [2026-11-13] lint | 0 issues found, 0 auto-fixed

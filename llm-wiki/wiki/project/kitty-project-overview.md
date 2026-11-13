@@ -1,12 +1,15 @@
 # Kitty: Core Awakening — project overview
 
-> Sources: Kitty project AGENTS.md, 2026-10-30; GDD v2, 2026-10-28; Engine design rev 5, 2026-10-30; Engine design rev 5 critique, 2026-10-30
-> Raw: [AGENTS.md](../../raw/project/2026-10-30-agents-md.md); [GDD v2](../../raw/game-design/2026-10-28-gdd-v2.md); [Engine design rev 5](../../raw/engine-design/2026-10-30-engine-design-rev5.md); [Rev 5 critique](../../raw/reviews/2026-10-30-engine-design-rev5-critique.md); [Rev 5 hand patches](../../raw/reviews/2026-10-30-rev5-hand-patches.md)
-> Updated: 2026-10-30
+> Sources: AGENTS.md, 2026-11-13; Kitty project AGENTS.md, 2026-10-30; GDD v2, 2026-10-28; Engine design rev 5, 2026-10-30; Engine design rev 5 critique, 2026-10-30
+> Raw: [AGENTS.md, 2026-11-13](../../raw/project/2026-11-13-agents-md.md); [AGENTS.md](../../raw/project/2026-10-30-agents-md.md); [GDD v2](../../raw/game-design/2026-10-28-gdd-v2.md); [Engine design rev 5](../../raw/engine-design/2026-10-30-engine-design-rev5.md); [Rev 5 critique](../../raw/reviews/2026-10-30-engine-design-rev5-critique.md); [Rev 5 hand patches](../../raw/reviews/2026-10-30-rev5-hand-patches.md)
+> Updated: 2026-11-13
 
 ## Overview
 
 Kitty: Core Awakening is an AROS-only 3D isometric puzzle-platformer, to be built LLM-first on a small custom C++20 engine. As of 2026-10-30 the project is design-only. The local folder `~/Work/Kitty` is not a git repo. The upstream repo (https://github.com/Ashahell/Kitty) holds only `README.md` and an MIT `LICENSE`. The authoritative game design is GDD v2. The engine design document reached revision 5, which was accepted, and its remaining fixes were patched by hand on 2026-10-30. No engine code exists yet.
+
+> **Status: Outdated** (2026-11-13)
+> The project is no longer design-only. The engine is CopperForge, and the code lives in `~/Work/Kitty/repo`, a clone of the upstream repo. `main` holds M0a + M0a.1 (`38fc422`), the project LLM wiki (`b5f929d`), the wiki ingest of M0b.15–M0b.22 (`3eef068`), and M0b, the AROS half of M0 (`707e601`, pushed 2026-11-13). M1 is next. See [M0 implementation status](../process/m0-implementation.md).
 
 ## Platform and toolchain stance
 
